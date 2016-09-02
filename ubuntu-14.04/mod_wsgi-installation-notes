@@ -1,0 +1,21 @@
+Because Graham Dumpleton's documentation is generally shit, to install mod_wsgi:
+
+  0.   Make sure you've `apt-get install apache2 apache2-threaded-dev` and that the Python install-
+       ation you're linking against was configured with --enable-shared.
+
+       -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  1.   Go to /usr/lib/apache2/modules and `wget` the source from 
+       https://github.com/GrahamDumpleton/mod_wsgi/releases
+  2.   `tar xvfz <source tarball>`
+  3.   `rm -r <source tarball>`
+  4.   Go into the source tarball folder and `./configure`
+  5.   `make`
+  6.   `make install`
+  7.   Remove the build directory
+  8.   Go the /etc/apache2/mods-available
+  9   `echo "LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so" >> wsgi.load`
+  10. `a2enmod wsgi`
+  11. `service apache2 restart`
+
+Aaand that should do it.

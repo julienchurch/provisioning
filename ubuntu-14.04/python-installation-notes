@@ -1,0 +1,35 @@
+When configuring Python for Apache, mod_wsgi, and virtualenv, do this:
+
+0) Install all dependencies for Python, which seems to be a pretty tangled issue. At the very least, gcc and libz are going to be necessary, but better look up this information on StackOverflow than to `make` a broken version of Python and only find out later.
+
+  Here's an example list from SO (should just be copy/pasteable)
+  build-essential
+  libncursesw5-dev
+  libreadline-dev
+  libssl-dev
+  libgdbm-dev
+  libc6-dev
+  libsqlite3-dev tk-dev
+  libbz2-dev
+
+1) `su root` and `wget` the gzipped tarball from Python's website and place it into `/opt/` 
+2) Extract the contents with `tar xfz Python<version>`
+3) `cd` into the new directory and `./configure --enable-shared`
+4) THIS IS IMPORTANT: after configuring, but before running `make`, set the environment variable LD_RUN_PATH to `/usr/local/lib`.
+
+    $ LD_RUN_PATH="/usr/local/lib" make
+
+    The rationale for this as provided by Python's bugtracker (https://bugs.python.org/issue16883):
+    
+    You need to be careful when using a Python with --enable-shared to ensure that the correct dynamic libraries are being used at execution time.  Normally, after a "make", you use "make install" to install the Python executable and the shared library into the configured locations, by default in /usr/local.  If you try to run a --enable-shared python executable from its build directory, you'll need to tell the dynamic loader where to find the shared library, i.e. the build directory itself. One way to do that is to use the LD_LIBRARY_PATH environment variable.  Otherwise, the dynamic loader will search the standard paths, like /usr/local/lib/ and /usr/lib/ for a shared library with the proper name (like libpython2.7.so.1.0).  If there is an older Python already installed with that name and if the ABI hasn't changed too much, you may be lucky and it will load and run.  In your example, you undoubtedly had a Python 2.7.2+ already installed in either /usr or /usr/local.  In this example, I have a shared 2.7.3rc2 installed in /usr/bin and am building a 2.7.3:
+    
+5) Run `make install`
+6) Run `/usr/local/bin/python -m ensurepip` to make sure pip is installed and working correctly
+7) Check Python version to make sure everything's working correctly
+
+FOR MORE INFORMATION SEE THESE POSTS.
+
+  They recommend two different things. So far I've only tried Graham Dumpleton's answer on SO, but it seems to work. I really don't know *why* because there's no shared library to link against in `/usr/local` when `make` is being run at first so it doesn't seem like it should work at all. Going to forge ahead blindly for now...
+  
+  http://stackoverflow.com/questions/22157184/strange-python-compilation-results-with-enable-shared-flag
+  https://bugs.python.org/issue16883
